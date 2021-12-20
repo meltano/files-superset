@@ -12,15 +12,19 @@ See [setup.py](./setup.py)) for the full list of bundled files.
 
 ## Installation
 
-Automated installation is not yet available.
+To install this file bundle run the following command and provide `git+https://github.com/pnadolny13/files-superset.git` for the `pip_url`:
 
-To manually install, first add the below or append to the `files:` section of your `meltano.yml` file
+
+```bash
+    meltano add files --custom superset
+```
+
+Then in order to call the docker-compose files properly you must add a custom utility to the meltano.yml manually.
 
 ```yml
-  files:
+  utilities:
   - name: superset
     namespace: superset
-    pip_url: git+https://github.com/pnadolny13/files-superset.git
     commands:
       # meltano invoke superset:ui
       ui:
@@ -28,8 +32,6 @@ To manually install, first add the below or append to the `files:` section of yo
         args: compose -f analyze/superset/docker-compose-non-dev.yml up
 ```
 
-Next, run `meltano install files superset`.
-
-If you're data source is not included in Superset out of the box then you need to install it in the `requirements-local.txt` for it to be avaiable. See [available database drivers](https://superset.apache.org/docs/databases/installing-database-drivers) and [installation instructions](https://superset.apache.org/docs/databases/dockeradddrivers).
+If you're datasource is not included in Superset out of the box then you need to install it in the `requirements-local.txt` for it to be avaiable. See [available database drivers](https://superset.apache.org/docs/databases/installing-database-drivers) and [installation instructions](https://superset.apache.org/docs/databases/dockeradddrivers).
 
 Lastly, invoke via `meltano invoke superset:ui`
