@@ -40,7 +40,7 @@ into `./docker/pythonpath_dev/superset_config_docker.py` (git ignored) and fill 
 ### Local packages
 
 If you want to add Python packages in order to test things like databases locally, you can simply add a local requirements.txt (`./docker/requirements-local.txt`)
-and rebuild your Docker stack.
+and restart your Docker stack.
 
 Steps:
 

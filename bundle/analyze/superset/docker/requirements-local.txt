@@ -1,2 +1,1 @@
-PyAthenaJDBC>1.0.9
-PyAthena>1.2.0
+# Add database driver dependencies here https://superset.apache.org/docs/databases/installing-database-drivers
