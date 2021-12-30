@@ -6,7 +6,7 @@ Files:
 - [`analyze/docker-compose.yml`](./bundle/analyze/docker-compose.yml) 
 - [`analyze/docker/*.sh`](./bundle/analyze/docker/) All the scripts used by docker-compose
 - [`analyze/docker/requirments-local.txt`](./bundle/analyze/docker/requirments-local.txt) A python requirements file for extra dependencies needed.
-
+- [`analyze/assets/`](./bundle/analyze/assets) A directory with subdirectories for Superset assets that are exported. Currently charts and dashboards are the only required assets since they include content for their respective databases and datasets.
 
 See [setup.py](./setup.py)) for the full list of bundled files.
 
@@ -51,7 +51,7 @@ Next add execution permission on the script files that were installed so that do
 
 `chmod +x analyze/superset/docker/*.sh`
 
-Lastly, invoke via `meltano invoke superset:up`
+Lastly, invoke via `meltano invoke superset:up` and navigate to `http://localhost:8088/`. The default Superset username and password are both `admin`.
 
 The other available commands are:
 
@@ -63,4 +63,12 @@ The other available commands are:
 
 * `meltano invoke superset:import` - Runs the import.py script that uses the API to import all the dashboards and charts in the `superset/assets` directory into Superset.
 
-Note: A caveat with the export/import commands are that you currently need to open up imported databases in the Superset UI and define a password as it will be masked during the export process.
+## Notes and Warnings
+
+A caveat with the export/import commands are that you currently need to open up imported databases in the Superset UI and define a password as it will be masked during the export process.
+
+A few configurations that come default with Superset have been adjusted to support the API import/export workflow:
+
+1. The `VERSIONED_EXPORT` feature flag is turned on to support a better import/export workflow.
+
+1. The `WTF_CSRF_ENABLED` is set to false since the import API has bugs that dont allow a valid CSRF token to be used right now. This configuration should be carefully considered in a production environment.
