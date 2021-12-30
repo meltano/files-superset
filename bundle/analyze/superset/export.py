@@ -37,7 +37,7 @@ def rename_subdir(dir_path):
     os.rename(orig_path_name, new_path_name)
 
 
-def export_assets(jwt_token, csrf_token, asset_type, name_key):
+def export_assets_zip(jwt_token, csrf_token, asset_type, name_key):
     headers = {
         "accept": "application/json",
         "Authorization": f"Bearer {jwt_token}",
@@ -52,18 +52,58 @@ def export_assets(jwt_token, csrf_token, asset_type, name_key):
             API_URL + f"{asset_type}/export", headers=headers, params={"q": f"[{id}]"})
         resp.raise_for_status()
         name = id_name_map.get(id)
-        filename = f"{id}_{name}.zip"
+        filename = f"{name}.zip"
         full_path = os.path.join(ASSETS_PATH, asset_type, filename)
         with open(full_path, "wb") as f:
             print(f"Exporting {asset_type}: {filename}")
             f.write(resp.content)
         shutil.unpack_archive(full_path, os.path.join(
-            ASSETS_PATH, asset_type, f"{id}_{name}"), "zip")
-        rename_subdir(os.path.join(ASSETS_PATH, asset_type, f"{id}_{name}"))
+            ASSETS_PATH, asset_type, f"{name}"), "zip")
+        rename_subdir(os.path.join(ASSETS_PATH, asset_type, f"{name}"))
         os.remove(full_path)
 
+def export_databases(jwt_token, csrf_token):
+    export_assets_zip(jwt_token, csrf_token, "database", "database_name")
+
+def export_charts(jwt_token, csrf_token):
+    export_assets_zip(jwt_token, csrf_token, "chart", "slice_name")
+    remove_chart_extras()
+
+
+def remove_chart_extras(dir_path):
+    base_path = os.path.join(ASSETS_PATH, "chart")
+    for chart_name in os.listdir(base_path):
+        export_path = os.path.join(base_path, chart_name, "export")
+        for filename in os.listdir(export_path):
+            full_path = os.path.join(export_path, filename)
+            if filename != "charts" and os.path.isdir(full_path):
+                shutil.rmtree(full_path)
+
+
+def export_assets_yaml(jwt_token, csrf_token, asset_type, name_key):
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {jwt_token}",
+        "X-CSRFToken": csrf_token
+    }
+    resp = requests.get(API_URL + asset_type, headers=headers)
+    resp.raise_for_status()
+    data = resp.json()
+    id_name_map = {i.get("id"): i.get(name_key) for i in data.get("result")}
+    for id in data.get("ids"):
+        resp = requests.get(
+            API_URL + f"{asset_type}/export", headers=headers, params={"q": f"[{id}]"})
+        resp.raise_for_status()
+        name = id_name_map.get(id)
+        filename = f"{name}.yaml"
+        full_path = os.path.join(ASSETS_PATH, asset_type, filename)
+        with open(full_path, "wb") as f:
+            print(f"Exporting {asset_type}: {filename}")
+            f.write(resp.content)
 
 jwt_token = get_jwt_token()
 csrf_token = get_csrf_token(jwt_token)
-export_assets(jwt_token, csrf_token, "dashboard", "dashboard_title")
-export_assets(jwt_token, csrf_token, "chart", "slice_name")
+export_assets_yaml(jwt_token, csrf_token, "dashboard", "dashboard_title")
+export_charts(jwt_token, csrf_token)
+export_databases(jwt_token, csrf_token)
+
