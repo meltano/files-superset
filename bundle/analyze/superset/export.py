@@ -57,9 +57,13 @@ def export_assets_zip(jwt_token, csrf_token, asset_type, name_key):
         with open(full_path, "wb") as f:
             print(f"Exporting {asset_type}: {filename}")
             f.write(resp.content)
+        dir_name = os.path.join(ASSETS_PATH, asset_type, f"{name}")
+        if os.path.exists(dir_name):
+            # clear directory if it already exists
+            shutil.rmtree(dir_name)
         shutil.unpack_archive(full_path, os.path.join(
             ASSETS_PATH, asset_type, f"{name}"), "zip")
-        rename_subdir(os.path.join(ASSETS_PATH, asset_type, f"{name}"))
+        rename_subdir(dir_name)
         os.remove(full_path)
 
 def export_databases(jwt_token, csrf_token):
@@ -70,10 +74,12 @@ def export_charts(jwt_token, csrf_token):
     remove_chart_extras()
 
 
-def remove_chart_extras(dir_path):
+def remove_chart_extras():
     base_path = os.path.join(ASSETS_PATH, "chart")
     for chart_name in os.listdir(base_path):
         export_path = os.path.join(base_path, chart_name, "export")
+        if not os.path.exists(export_path):
+            continue
         for filename in os.listdir(export_path):
             full_path = os.path.join(export_path, filename)
             if filename != "charts" and os.path.isdir(full_path):
@@ -106,4 +112,3 @@ csrf_token = get_csrf_token(jwt_token)
 export_assets_yaml(jwt_token, csrf_token, "dashboard", "dashboard_title")
 export_charts(jwt_token, csrf_token)
 export_databases(jwt_token, csrf_token)
-
