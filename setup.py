@@ -12,6 +12,7 @@ setup(
             "analyze/superset/docker/*",
             "analyze/superset/docker/.env",
             "analyze/superset/pythonpath_dev/*",
+            "analyze/superset/assets/*/.*",
         ]
     },
 )
