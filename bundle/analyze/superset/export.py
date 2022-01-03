@@ -85,6 +85,16 @@ def remove_chart_extras():
             if filename != "charts" and os.path.isdir(full_path):
                 shutil.rmtree(full_path)
 
+def clear_assets():
+    for path_name in os.listdir(ASSETS_PATH):
+        for asset_name in os.listdir(os.path.join(ASSETS_PATH, path_name)):
+            if not asset_name.startswith("."):
+                # skip .gitkeep files
+                asset_path = os.path.join(ASSETS_PATH, path_name, asset_name)
+                if os.path.isdir(asset_path):
+                    shutil.rmtree(asset_path)
+                else:
+                    os.remove(asset_path)
 
 def export_assets_yaml(jwt_token, csrf_token, asset_type, name_key):
     headers = {
@@ -109,6 +119,7 @@ def export_assets_yaml(jwt_token, csrf_token, asset_type, name_key):
 
 jwt_token = get_jwt_token()
 csrf_token = get_csrf_token(jwt_token)
+clear_assets()
 export_assets_yaml(jwt_token, csrf_token, "dashboard", "dashboard_title")
 export_charts(jwt_token, csrf_token)
 export_databases(jwt_token, csrf_token)
