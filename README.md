@@ -69,6 +69,4 @@ A caveat with the export/import commands are that you currently need to open up 
 
 A few configurations that come default with Superset have been adjusted to support the API import/export workflow:
 
-1. The `VERSIONED_EXPORT` feature flag is turned on to support a better import/export workflow.
-
 1. The `WTF_CSRF_ENABLED` is set to false since the import API has bugs that dont allow a valid CSRF token to be used right now. This configuration should be carefully considered in a production environment.
