@@ -1,5 +1,7 @@
 # files-superset
 
+Note: This file-bundle is functional but is still Beta. Its intended for local instances only. Please test it out and provide feedback, contributions are always welcome too!
+
 Meltano project [file bundle](https://meltano.com/docs/command-line-interface.html#file-bundle) for [Superset](https://superset.apache.org/). These files were pulled from the [Superset docker guide](https://superset.apache.org/docs/installation/installing-superset-using-docker-compose) with some minor adjustments.
 
 Files:
@@ -12,11 +14,11 @@ See [setup.py](./setup.py)) for the full list of bundled files.
 
 ## Installation
 
-To install this file bundle run the following command and provide `git+https://github.com/pnadolny13/files-superset.git` for the `pip_url`:
+To install this file bundle run the following command and provide `git+https://gitlab.com/meltano/files-superset.git` for the `pip_url`:
 
 
 ```bash
-    meltano add files --custom superset
+meltano add files --custom superset
 ```
 
 Then in order to call the docker-compose files properly you must add a custom utility to the meltano.yml manually. This sets the ui command needed to start the containers.
