@@ -41,10 +41,12 @@ plugins:
       import:
         executable: python
         args: analyze/superset/import.py
+environments:
+  - name: dev
     env:
-      API_URL: http://localhost:8088
-      USER: admin
-      PASS: admin
+      SUPERSET_API_URL: http://localhost:8088
+      SUPERSET_USER: admin
+      SUPERSET_PASS: admin
 ```
 
 If you're datasource is not included in Superset out of the box then you need to install it in the `requirements-local.txt` for it to be avaiable. See [available database drivers](https://superset.apache.org/docs/databases/installing-database-drivers) and [installation instructions](https://superset.apache.org/docs/databases/dockeradddrivers).
@@ -53,17 +55,17 @@ Next add execution permission on the script files that were installed so that do
 
 `chmod +x analyze/superset/docker/*.sh`
 
-Lastly, invoke via `meltano invoke superset:up` and navigate to `http://localhost:8088/`. The default Superset username and password are both `admin`.
+Lastly, invoke via `meltano --environment=dev invoke superset:up` and navigate to `http://localhost:8088/`. The default Superset username and password are both `admin`.
 
 The other available commands are:
 
-* `meltano invoke superset:up` - Starts all required docker containers in the background using the docker-compose.yml.
+* `meltano --environment=dev invoke superset:up` - Starts all required docker containers in the background using the docker-compose.yml.
 
-* `meltano invoke superset:down` - Stops all docker containers defined in the docker-compose.yml. This includes the `-v` argument which destroys all volumes so any assets in the local instance of Superset will be destroyed. If you want stop Superset but still preserve your assets you can either remove this `-v` argument or use the following export/import workflow.
+* `meltano --environment=dev invoke superset:down` - Stops all docker containers defined in the docker-compose.yml. This includes the `-v` argument which destroys all volumes so any assets in the local instance of Superset will be destroyed. If you want stop Superset but still preserve your assets you can either remove this `-v` argument or use the following export/import workflow.
 
-* `meltano invoke superset:export` - Runs the export.py script that uses the API to export all dashboards and charts from Superset to the `superset/assets` directory.
+* `meltano --environment=dev invoke superset:export` - Runs the export.py script that uses the API to export all dashboards and charts from Superset to the `superset/assets` directory.
 
-* `meltano invoke superset:import` - Runs the import.py script that uses the API to import all the dashboards and charts in the `superset/assets` directory into Superset.
+* `meltano --environment=dev invoke superset:import` - Runs the import.py script that uses the API to import all the dashboards and charts in the `superset/assets` directory into Superset.
 
 ## Notes and Warnings
 
