@@ -96,6 +96,6 @@ def import_assets_yaml(jwt_token, asset_type):
 
 
 jwt_token = get_jwt_token()
-import_assets_zip(jwt_token, "database")
+# import_assets_zip(jwt_token, "database")
 import_assets_zip(jwt_token, "chart")
 import_assets_yaml(jwt_token, "dashboard")

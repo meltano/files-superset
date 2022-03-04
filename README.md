@@ -34,7 +34,7 @@ plugins:
         args: compose -f analyze/superset/docker-compose.yml up -d
       down:
         executable: /usr/local/bin/docker
-        args: compose -f analyze/superset/docker-compose.yml down -v
+        args: compose -f analyze/superset/docker-compose.yml down
       export:
         executable: python
         args: analyze/superset/export.py
@@ -65,7 +65,7 @@ The other available commands are:
 
 * `meltano --environment=dev invoke superset:export` - Runs the export.py script that uses the API to export all dashboards and charts from Superset to the `superset/assets` directory.
 
-* `meltano --environment=dev invoke superset:import` - Runs the import.py script that uses the API to import all the dashboards and charts in the `superset/assets` directory into Superset.
+* `meltano --environment=dev invoke superset:import` - Runs the import.py script that uses the API to import all the dashboards and charts in the `superset/assets` directory into Superset. Currently databases are excluded from importing so you will need to manually add them prior to importing.
 
 ## Notes and Warnings
 
