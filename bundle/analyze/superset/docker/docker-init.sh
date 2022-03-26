@@ -22,7 +22,7 @@ set -e
 #
 /app/docker/docker-bootstrap.sh
 
-STEP_CNT=4
+STEP_CNT=5
 
 echo_step() {
 cat <<EOF
@@ -76,4 +76,12 @@ if [ "$SUPERSET_LOAD_EXAMPLES" = "yes" ]; then
         superset load_examples
     fi
     echo_step "4" "Complete" "Loading examples"
+else
+    echo_step "4" "Skipping" "Loading examples"
+fi
+
+
+if [ "$MELTANO_SYNC_TABLES" = "true" ]; then
+    echo_step "5" "Starting" "Loading datasources"
+    superset import_datasources -p /app/assets/database/datasources.yml
 fi
