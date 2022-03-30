@@ -36,17 +36,20 @@ plugins:
         executable: /usr/local/bin/docker
         args: compose -f analyze/superset/docker-compose.yml down
       ui:
-        executable: /usr/local/bin/docker
-        args: compose -f analyze/superset/docker-compose.yml up
-      export:
-        executable: python
-        args: analyze/superset/export.py
-      import:
-        executable: python
-        args: analyze/superset/import.py
+        executable: /bin/bash
+        args: analyze/superset/start_ui.sh
+      export_dashboards:
+        executable: /bin/bash
+        args: analyze/superset/export_dashboards.sh
+      import_dashboards:
+        executable: /bin/bash
+        args: analyze/superset/import_dashboards.sh
       compile_datasources:
         executable: python
         args: analyze/superset/compile_datasources.py
+      load_datasources:
+        executable: /bin/bash
+        args: analyze/superset/load_datasources.sh
     settings:
       - name: tables
         kind: array
