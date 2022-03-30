@@ -82,6 +82,7 @@ fi
 
 
 if [ "$MELTANO_SYNC_TABLES" = "true" ]; then
-    echo_step "5" "Starting" "Loading datasources"
+    echo_step "5" "Starting" "Loading assets"
     superset import_datasources -p /app/assets/database/datasources.yml
+    superset import-dashboards -p /app/assets/dashboard/dashboards.json
 fi
