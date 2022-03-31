@@ -44,9 +44,6 @@ plugins:
       import_dashboards:
         executable: /bin/bash
         args: analyze/superset/import_dashboards.sh
-      compile_datasources:
-        executable: python
-        args: analyze/superset/compile_datasources.py
       load_datasources:
         executable: /bin/bash
         args: analyze/superset/load_datasources.sh
@@ -73,14 +70,16 @@ Add execution permission on the script files that were installed so that docker 
 
 `chmod +x analyze/superset/docker/*.sh`
 
-If you'd like to sync your dbt tables to Superset, first run a dbt compile, then run the `compile_datasources` command before turning Superset on. Then turn on Superset and navigate to http://localhost:8088/. The default Superset username and password are both `admin`.
-
+If you'd like to sync your dbt tables to Superset, first run a dbt compile, then use the `ui` command to turn Superset on.
+Use the settings in the example meltano.yml entry to configure what tables to sync into Superset.
+If you change these settings or update your dbt models, just run the `load_datasources` command to refresh Superset.
 
 ```bash
 meltano --environment=dev invoke dbt:compile
-meltano --environment=dev invoke superset:compile_datasources
 meltano --environment=dev invoke superset:ui
 ```
+
+Once Superset is on, navigate to http://localhost:8088/. The default Superset username and password are both `admin`.
 
 The other available commands are:
 
@@ -88,16 +87,12 @@ The other available commands are:
 
 * `meltano --environment=dev invoke superset:down` - Stops all docker containers defined in the docker-compose.yml. This includes the `-v` argument which destroys all volumes so any assets in the local instance of Superset will be destroyed. If you want stop Superset but still preserve your assets you can either remove this `-v` argument or use the following export/import workflow.
 
-* `meltano --environment=dev invoke superset:export` - Runs the export.py script that uses the API to export all dashboards and charts from Superset to the `superset/assets` directory.
+* `meltano --environment=dev invoke superset:export_dashboards` - Runs the export_dashboards.sh script that uses the CLI to export all dashboards from Superset to the `superset/assets/dashboard` directory.
 
-* `meltano --environment=dev invoke superset:import` - Runs the import.py script that uses the API to import all the dashboards and charts in the `superset/assets` directory into Superset. Currently databases are excluded from importing so you will need to manually add them prior to importing.
+* `meltano --environment=dev invoke superset:import_dashboards` - Runs the import_dashboards.sh script that uses the CLI to import the dashboard definitions in the `superset/assets/dashboard` directory into Superset.
 
-* `meltano --environment=dev invoke superset:compile_datasources` - Uses the dbt manifest.json file to generate a Superset compliant datasource.yml which is then imported on startup.
+* `meltano --environment=dev invoke superset:load_datasources` - Uses the dbt manifest.json file to generate a Superset compliant datasource.yml which is then imported via the CLI.
 
 ## Notes and Warnings
 
-A caveat with the export/import commands are that you currently need to open up imported databases in the Superset UI and define a password as it will be masked during the export process.
-
-A few configurations that come default with Superset have been adjusted to support the API import/export workflow:
-
-1. The `WTF_CSRF_ENABLED` is set to false since the import API has bugs that dont allow a valid CSRF token to be used right now. This configuration should be carefully considered in a production environment.
+A caveat with the export/import commands are that you currently need to open up imported databases in the Superset UI and re-save them because the passwords dont seem to be initialized properly when imported using the CLI.
