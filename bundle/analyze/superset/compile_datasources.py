@@ -25,7 +25,10 @@ dbt_nodes = read_dbt_manifest(project_root)
 
 tables = []
 for table_name, table_def in dbt_nodes.get("nodes").items():
-    if table_name not in superset_config.get("tables"):
+    if (
+        not superset_config.get("load_all_dbt_models") and
+        table_name not in superset_config.get("tables")
+    ):
         continue
     super_table_def = {}
     table_alias = table_def.get("alias")
@@ -49,7 +52,7 @@ for table_name, table_def in dbt_nodes.get("nodes").items():
 database_def = {
     "database_name": "local_postgres",
     "extra": '{"allows_virtual_table_explore":true,"metadata_params":{},"engine_params":{},"schemas_allowed_for_csv_upload":[]}',
-    "sqlalchemy_uri": "postgresql+psycopg2://meltano:meltano@host.docker.internal:5432/warehouse",
+    "sqlalchemy_uri": f"postgresql+psycopg2://{os.environ['PG_USERNAME']}:{os.environ['PG_PASSWORD']}@host.docker.internal:{os.environ['PG_PORT']}/{os.environ['PG_DATABASE']}",
     "tables": tables
 }
 superset_data = {
