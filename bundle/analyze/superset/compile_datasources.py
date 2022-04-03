@@ -1,9 +1,8 @@
-import os
-import yaml
-import subprocess
 import json
+import os
 
-ENVIRONMENT = "dev"
+import yaml
+
 
 def read_dbt_manifest(project_root):
     local_filepath = f"{project_root}/.meltano/transformers/dbt/target/manifest.json"
@@ -11,23 +10,17 @@ def read_dbt_manifest(project_root):
         return json.load(f)
 
 project_root = os.getenv("MELTANO_PROJECT_ROOT", os.getcwd())
-meltano_bin = ".meltano/run/bin"
-result = subprocess.run(
-    [meltano_bin, f"--environment={ENVIRONMENT}","config", "superset"],
-    cwd=project_root,
-    stdout=subprocess.PIPE,
-    universal_newlines=True,
-    check=True,
-)
-superset_config = json.loads(result.stdout)
 
 dbt_nodes = read_dbt_manifest(project_root)
+
+selected_tables = json.loads(os.getenv("SUPERSET_TABLES", "[]"))
+load_all = os.getenv("SUPERSET_LOAD_ALL_DBT_MODELS")
 
 tables = []
 for table_name, table_def in dbt_nodes.get("nodes").items():
     if (
-        not superset_config.get("load_all_dbt_models") and
-        table_name not in superset_config.get("tables")
+        not load_all == "true" and
+        table_name not in selected_tables
     ):
         continue
     super_table_def = {}
@@ -50,9 +43,9 @@ for table_name, table_def in dbt_nodes.get("nodes").items():
 
 
 database_def = {
-    "database_name": "local_postgres",
+    "database_name": os.getenv("SUPERSET_DATABASE_NAME", "db_name"),
     "extra": '{"allows_virtual_table_explore":true,"metadata_params":{},"engine_params":{},"schemas_allowed_for_csv_upload":[]}',
-    "sqlalchemy_uri": f"postgresql+psycopg2://{os.environ['PG_USERNAME']}:{os.environ['PG_PASSWORD']}@host.docker.internal:{os.environ['PG_PORT']}/{os.environ['PG_DATABASE']}",
+    "sqlalchemy_uri": os.environ["SUPERSET_SQLALCHEMY_URI"],
     "tables": tables
 }
 superset_data = {
@@ -63,3 +56,8 @@ superset_data = {
 
 with open(os.path.join(project_root, "analyze", "superset", "assets", "database", "datasources.yml"), "w") as yaml_file:
     yaml.dump(superset_data, yaml_file, default_flow_style=False)
+
+with open(os.path.join(project_root, "analyze", "superset", "docker", "requirements-local.txt"), "w") as req_file:
+    deps = "\n".join(json.loads(os.getenv("SUPERSET_ADDITIONAL_DEPENDENCIES", "[]")))
+    content = f"# Add database driver dependencies here https://superset.apache.org/docs/databases/installing-database-drivers\n{deps}"
+    req_file.write(content)

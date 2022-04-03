@@ -48,12 +48,25 @@ plugins:
         executable: /bin/bash
         args: analyze/superset/load_datasources.sh
     settings:
-      - name: tables
-        kind: array
-      - name: load_all_dbt_models
-        kind: boolean
-        value: false
+          - name: tables
+            description: An array of table names to import into Supserset. They must be in dbt format e.g. `model.my_meltano_project.customers`.
+            kind: array
+          - name: load_all_dbt_models
+            description: A boolean whether to import all known models from dbt or not. If not, use the `tables` array to select by name.
+            kind: boolean
+            value: false
+          - name: sqlalchemy_uri
+            description: The full SQLAlchemy uri for your database engine.
+              Make sure additional dependencies are installed to use the particular engine.
+          - name: database_name
+            description: The alias for your database once imported into Superset.
+          - name: additional_dependencies
+            kind: array
+            description: An array of python dependencies to include as part of startup.
+              A list of database driver dependencies can be found here https://superset.apache.org/docs/databases/installing-database-drivers
     config:
+      database_name: my_postgres
+      sqlalchemy_uri: postgresql+psycopg2://${PG_USERNAME}:${PG_PASSWORD}@host.docker.internal:${PG_PORT}/${PG_DATABASE}
       tables:
       - model.my_meltano_project.table_name_x
 environments:
