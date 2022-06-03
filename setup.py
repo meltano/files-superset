@@ -7,12 +7,7 @@ setup(
     packages=find_packages(),
     package_data={
         "bundle": [
-            "analyze/superset/README.md",
             "analyze/superset/*",
-            "analyze/superset/docker/*",
-            "analyze/superset/docker/.env",
-            "analyze/superset/docker/pythonpath_dev/*",
-            "analyze/superset/assets/*/.*",
         ]
     },
 )
