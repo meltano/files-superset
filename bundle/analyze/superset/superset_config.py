@@ -14,10 +14,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# Ignore everything
-*
-# DON'T ignore the .gitignore
-!.gitignore
-!superset_config.py
-!superset_config_local.example
